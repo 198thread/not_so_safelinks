@@ -1,0 +1,65 @@
+### Schema
+
+`&data=` has this:
+
+| Position | Value in Sample | Exact Purpose & Mechanism |
+| - | - | - |
+| 0 | `04` | Schema Version: Tells Microsoft's edge servers which parsing algorithm to use (Versions 1-4 exist, late 2026). |
+| 1 | `01` | Recipient Type Flag: Indicates an internal M365 user/mailbox context. |
+| 2 | `<User Email>` | Recipient **mailbox address** / User Principal Name (UPN) |
+| 3 | `<32 Hex Chars>` | Tenant ID: 128-bit GUID, no hyphens |
+| 4 | `<32 Hex Chars>` | Entra ID OR User Object ID OR Exchange Directory ID: 128-bit GUID, no hyphens. |
+| 5 | `0` | Action / Threat State Flag: Internal routing flag (e.g., whether the link was clicked pre- or post-delivery). |
+| 6 | `0` | Isolation Level: Signals whether rendering requires browser isolation or basic proxying. |
+| 7 | `<18-Digit Timestamp>` | [Windows File Time](https://learn.microsoft.com/en-us/windows/win32/sysinfo/file-times) **Not** a UNIX timestamp. |
+| 8 | `unknown` | Threat Verdict: Default placeholder field populated when no prior bad-reputation verdict exists at wrap-time. |
+| 9 | `<Base64>` | **Client Fingerprint:** Version, Platform, Application Name, Wrapping Type (e.g. `Mailflow|{"V":"0.0.0000","P":"Win32","AN":"Mail","WT":2}` for Version 0, Platform Windows, Mail app, Client-side render).|
+| 10 | `1000` | Routing Flag / Policy Bitmask: Internal policy enforcement state applied by the Exchange Transport Rule engine. |
+
+### Recipient Type Flag
+Enum:
+- 01 = Internal Org Mailbox
+- 02 = Guest/AZ External User
+- 03 = Shared/Equipment Mailbox
+- 04 = External Recipient/Outbound
+- 05 = Distribution Group/List Context
+
+### Action / Threat State Flag
+Enum:
+- 0 = Pre-delivery (default)
+- 1 = Threat Identified/Modified (updated by Exchange Transport Rule)
+
+### Threat Verdict
+Enum:
+- unknown (default, meaning every click = link check against AZ Intel DB)
+- clean/safe
+- malware
+- phishing
+- spam
+- suspicious
+- custom/blocked
+
+### Windows File Time
+
+*The number of 100-nanosecond intervals since January 1, 1601 (UTC)*
+
+Conversion is 
+
+FromUnixTimestamp((<sample> / 10_000_000) - 11_644_473_600)
+
+This is legacy, think 16b long pointer.
+
+### Wrapping Type
+Enum:
+- 0 = Pre-delivery scanning
+- 1 = Time-of-click rewriting
+- 2 = Client-side rendering
+- 3 = O365 Integration, 4 = Teams
+
+### NB
+`&data=` is followed with `&sdata=` and `&reserved=\d`.
+
+`&sdata=` is url integrity via HMAC-256 of everything in the URL except `&sdata=`, but including `&reserved=\d`
+
+`&reserved=\d` takes a bit mask for flags. Possibly underused.
+
