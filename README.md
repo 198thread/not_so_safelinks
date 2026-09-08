@@ -25,6 +25,8 @@ If public url has 'aspx' or feels like a MS product, grep the html.
 
 When safelinks are copy-pasted into other applications, e.g. Outlook [CTRL-V> Teams
 
+---
+
 ### Grep
 Link format is `https://<region><node>.safelinks.protection.outlook.com/?url=...`
 
