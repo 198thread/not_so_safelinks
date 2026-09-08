@@ -20,9 +20,7 @@
 Enum:
 - 01 = Internal Org Mailbox
 - 02 = [External Usertype](https://learn.microsoft.com/en-us/entra/external-id/user-properties) Guest/Member
-- 03 = Shared/Equipment Mailbox
-- 04 = External Recipient/Outbound
-- 05 = Distribution Group/List Context
+
 
 ### Action / Threat State Flag
 Enum:
