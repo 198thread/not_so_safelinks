@@ -8,10 +8,10 @@
 | 1 | `01` | Recipient Type Flag: Indicates an internal M365 user/mailbox context. |
 | 2 | `<User Email>` | Recipient **mailbox address** / User Principal Name (UPN) |
 | 3 | `<32 Hex Chars>` | Tenant ID: 128-bit GUID, no hyphens |
-| 4 | `<32 Hex Chars>` | Entra ID OR User Object ID OR Exchange Directory ID: 128-bit GUID, no hyphens. |
+| 4 | `<32 Hex Chars>` | Mailbox ID OR User Object ID OR Exchange Directory ID: 128-bit GUID, no hyphens. |
 | 5 | `0` | Action / Threat State Flag: Internal routing flag (e.g., whether the link was clicked pre- or post-delivery). |
 | 6 | `0` | Isolation Level: Signals whether rendering requires browser isolation or basic proxying. |
-| 7 | `<18-Digit Timestamp>` | [Windows File Time](https://learn.microsoft.com/en-us/windows/win32/sysinfo/file-times) **Not** a UNIX timestamp. |
+| 7 | `<18-Digit Timestamp>` | [.Net Datetime Ticks](https://learn.microsoft.com/en-us/dotnet/api/system.datetime.ticks?view=net-10.0)  |
 | 8 | `unknown` | Threat Verdict: Default placeholder field populated when no prior bad-reputation verdict exists at wrap-time. |
 | 9 | `<Base64>` | **Client Fingerprint:** Version, Platform, Application Name, Wrapping Type (e.g. `Mailflow|{"V":"0.0.0000","P":"Win32","AN":"Mail","WT":2}` for Version 0, Platform Windows, Mail app, Client-side render).|
 | 10 | `1000` | Routing Flag / Policy Bitmask: Internal policy enforcement state applied by the Exchange Transport Rule engine. |
@@ -39,15 +39,15 @@ Enum:
 - suspicious
 - custom/blocked
 
-### Windows File Time
+### .Net Datetime Ticks
 
-*The number of 100-nanosecond intervals since January 1, 1601 (UTC)*
+*Each tick is 100-nanosecond intervals since January 1, 0001 AD (00:00:00 UTC)*
 
 Conversion is 
 
-FromUnixTimestamp((<sample> / 10_000_000) - 11_644_473_600)
+FromUnixTimestamp((<sample> - 621_355_968_000_000_000) / 10_000_000)
 
-This is legacy, think 16b long pointer.
+It's 18 digits, you're better off using [a online converter](https://www.epochconverter.com/dotnet)
 
 ### Wrapping Type
 Enum:
