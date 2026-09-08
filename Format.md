@@ -4,7 +4,7 @@
 
 | Position | Value in Sample | Exact Purpose & Mechanism |
 | - | - | - |
-| 0 | `04` | Schema Version: Tells Microsoft's edge servers which parsing algorithm to use (Versions 1-4 exist, late 2026). |
+| 0 | `04` | Schema Version: Tells Microsoft's edge servers which parsing algorithm to use (Versions 01...05 exist, late 2026). |
 | 1 | `01` | Recipient Type Flag: Indicates an internal M365 user/mailbox context. |
 | 2 | `<User Email>` | Recipient **mailbox address** / User Principal Name (UPN) |
 | 3 | `<32 Hex Chars>` | Tenant ID: 128-bit GUID, no hyphens |
