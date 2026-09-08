@@ -13,7 +13,7 @@
 | 6 | `0` | Isolation Level: Signals whether rendering requires browser isolation or basic proxying. |
 | 7 | `<18-Digit Timestamp>` | [.Net Datetime Ticks](https://learn.microsoft.com/en-us/dotnet/api/system.datetime.ticks?view=net-10.0)  |
 | 8 | `unknown` | Threat Verdict: Default placeholder field populated when no prior bad-reputation verdict exists at wrap-time. |
-| 9 | `<Base64>` | **Client Fingerprint:** Version, Platform, Application Name, Wrapping Type (e.g. `Mailflow|{"V":"0.0.0000","P":"Win32","AN":"Mail","WT":2}` for Version 0, Platform Windows, Mail app, Client-side render).|
+| 9 | `<Base64>` | **Client Fingerprint:** (Optional 'EmptyMapi for delivery agents) Version, Platform, Application Name, Wrapping Type (e.g. `Mailflow\|{"V":"0.0.0000","P":"Win32","AN":"Mail","WT":2}` for Version 0, Platform Windows, Mail app, Client-side render).|
 | 10 | `1000` | Routing Flag / Policy Bitmask: Internal policy enforcement state applied by the Exchange Transport Rule engine. |
 
 ### Recipient Type Flag
