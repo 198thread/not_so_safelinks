@@ -1,63 +1,110 @@
-### Schema
+### Schema 01 — 6 Fields
 
-`&data=` has this:
-
-| Position | Value in Sample | Exact Purpose & Mechanism |
+| Pos | Values | Status |
 | - | - | - |
-| 0 | `04` | Schema Version: Tells Microsoft's edge servers which parsing algorithm to use (Versions 01...05 exist, late 2026). |
-| 1 | `01` | Recipient Type Flag: Indicates an internal M365 user/mailbox context. |
-| 2 | `<User Email>` | Recipient **mailbox address** / User Principal Name (UPN) |
-| 3 | `<32 Hex Chars>` | Tenant ID: 128-bit GUID, no hyphens |
-| 4 | `<32 Hex Chars>` | Mailbox ID OR User Object ID OR Exchange Directory ID: 128-bit GUID, no hyphens. |
-| 5 | `0` | Action / Threat State Flag: Internal routing flag (e.g., whether the link was clicked pre- or post-delivery). |
-| 6 | `0` | Isolation Level: Signals whether rendering requires browser isolation or basic proxying. |
-| 7 | `<18-Digit Timestamp>` | [.Net Datetime Ticks](https://learn.microsoft.com/en-us/dotnet/api/system.datetime.ticks?view=net-10.0)  |
-| 8 | `unknown` | Threat Verdict: Default placeholder field populated when no prior bad-reputation verdict exists at wrap-time. |
-| 9 | `<Base64>` | **Client Fingerprint:** (Optional 'EmptyMapi for delivery agents) Version, Platform, Application Name, Wrapping Type (e.g. `Mailflow\|{"V":"0.0.0000","P":"Win32","AN":"Mail","WT":2}` for Version 0, Platform Windows, Mail app, Client-side render).|
-| 10 | `1000` | Routing Flag / Policy Bitmask: Internal policy enforcement state applied by the Exchange Transport Rule engine. |
+| 0 | `01` | Fixed |
+| 1 | `01` | Fixed |
+| 2 | address / empty | Recipient. Locks field 4. Locks field 5 |
+| 3 | 32-hex | Message ID. Matches [Network Message ID](https://learn.microsoft.com/en-us/powershell/module/exchangepowershell/get-messagetracev2). Not RFC4122 — variant nibble random. No time order |
+| 4 | 32-hex | Tenant ID. RFC4122 confirmed. Recipient's tenant, not sender's |
+| 5 | `0` `1` | Unknown. Static per message. No flip observed on same message |
 
-### Recipient Type Flag
-Enum:
-- 01 = Internal Org Mailbox
-- 02 = [External Usertype](https://learn.microsoft.com/en-us/entra/external-id/user-properties) Guest/Member
+---
 
+### Schema 02 — 8 Fields
 
-### Action / Threat State Flag
-Enum:
-- 0 = Pre-delivery (default)
-- 1 = Threat Identified/Modified (updated by Exchange Transport Rule)
+| Pos | Values | Status |
+| - | - | - |
+| 0 | `02` | Fixed |
+| 1 | `01` | Fixed. `02` not observed here |
+| 2 | address / empty | Recipient. Locks field 4. Locks field 6 |
+| 3 | 32-hex | Message ID. Same as schema 01 |
+| 4 | 32-hex | Tenant ID. Same as schema 01 |
+| 5 | `0` `1` | Unknown. Static per message. Zero flips observed, any direction |
+| 6 | `0` `1` | Unknown. Dynamic per click. Flips both directions observed |
+| 7 | 18-digit | Ticks. [.NET DateTime.Ticks](https://learn.microsoft.com/en-us/dotnet/api/system.datetime.ticks). Converter: [epochconverter.com/dotnet](https://www.epochconverter.com/dotnet) |
 
-### Threat Verdict
-Enum:
-- unknown (default, meaning every click = link check against AZ Intel DB)
-- clean/safe
-- malware
-- phishing
-- spam
-- suspicious
-- custom/blocked
+---
 
-### .Net Datetime Ticks
+### Schema 04 — 11 Fields
 
-*Each tick is 100-nanosecond intervals since January 1, 0001 AD (00:00:00 UTC)*
+| Pos | Values | Status |
+| - | - | - |
+| 0 | `04` | Fixed |
+| 1 | `01` | Fixed. `02` not observed here |
+| 2 | address / empty | Recipient. Locks fields 4, 8, 9 |
+| 3 | 32-hex | Message ID |
+| 4 | 32-hex | Tenant ID |
+| 5 | `0` `1` | Unknown |
+| 6 | `0` `1` | Unknown |
+| 7 | 18-digit | Ticks |
+| 8 | `Unknown` | Verdict. No `Good` here. Checked against [Defender threat classification](https://learn.microsoft.com/en-us/defender-office-365/mdo-threat-classification) — no match |
+| 9 | base64 | `Mailflow\|{V,P,AN,WT:2}`. No `EmptyMapi` here |
+| 10 | `0` `1000` `2000` `3000` `4000` `5000` `7000` | Unknown. Multiples of 1000 |
 
-Conversion is 
+---
 
-FromUnixTimestamp((<sample> - 621_355_968_000_000_000) / 10_000_000)
+### Schema 05 — 11 Fields (14 raw, last 3 empty)
 
-It's 18 digits, you're better off using [a online converter](https://www.epochconverter.com/dotnet)
+Not observed in every region checked.
 
-### Wrapping Type
-Enum:
-- 0 = Pre-delivery scanning
-- 1 = Time-of-click rewriting
-- 2 = Client-side rendering
-- 3 = O365 Integration, 4 = Teams
+| Pos | Values | Status |
+| - | - | - |
+| 0 | `05` | Fixed |
+| 1 | `01` `02` | Matches [Entra B2B UserType](https://learn.microsoft.com/en-us/entra/external-id/user-properties): Member / Guest |
+| 2 | address / empty | Recipient. Locks field 4. Locks field 8 |
+| 3 | 32-hex | Message ID |
+| 4 | 32-hex | Tenant ID |
+| 5 | `0` `1` | Unknown. Static per message |
+| 6 | `0` `1` | Unknown. Dynamic per click |
+| 7 | 18-digit | Ticks. Confirmed |
+| 8 | `Unknown` `Good` | Verdict. `Good` pairs with `WAC`/WT:4 always. Rare |
+| 9 | base64 | `Mailflow\|{V,P,AN,WT:2}` or `WAC\|{V,P,AN,WT:4}`. `EmptyMapi` present implies field 1 = `02`. Reverse not true |
+| 10 | `0` `1` `1000`–`80000` | Unknown. `1` only on WT:4 rows |
 
-### NB
-`&data=` is followed with `&sdata=` and `&reserved=\d`.
+---
 
-`&sdata=` is url integrity via HMAC-256 of everything in the URL except `&sdata=`, but including `&reserved=\d`
+### Placeholder Tenant: `84df9e7fe9f640afb435aaaaaaaaaaaa`
 
-`&reserved=\d` takes a bit mask for flags. Possibly underused.
+| Check | Result |
+| - | - |
+| Consumer mailbox marker (Hotmail/Outlook/MSN/Live) | Yes |
+| Real Entra tenant | No |
+| Forces field 5 = `1` | Yes |
+| Recipient email blank | Mostly yes |
+| One sender spamming | No |
+| Tied to `EmptyMapi` / agent clients | No |
+| Node bytes = deliberate sentinel (`aa`×6, not random) | Yes |
+| Encodes region / routing | No |
+| Matches Microsoft [Multi-Geo / PreferredDataLocation](https://learn.microsoft.com/en-us/microsoft-365/enterprise/microsoft-365-multi-geo) model | Yes — routing is a directory lookup, not GUID-encoded |
 
+---
+
+### Tenant ID Integrity
+
+| Check | Result |
+| - | - |
+| RFC4122 compliant, all schemas | Yes |
+| Stable per org | Yes |
+| Shared across clouds | No |
+| Shared across regions (same cloud) | Yes |
+| Encodes routing | No |
+
+### Message ID Integrity
+
+| Check | Result |
+| - | - |
+| RFC4122 compliant | No |
+| Carries timestamp / order | No |
+| Spans multiple ticks values per ID | Yes |
+
+---
+
+### Field 5 vs Field 6
+
+| | Field 5 | Field 6 |
+| - | - | - |
+| Flips across clicks of same message | No | Yes |
+| Looks per-message | Yes | No |
+| Looks per-click | No | Yes |
+| Meaning | Unknown | Unknown |
