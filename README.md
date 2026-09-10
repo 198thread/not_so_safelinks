@@ -1,7 +1,7 @@
 # not_so_safelinks
 Informal learning notes on the [MS Safelinks](https://learn.microsoft.com/en-us/defender-office-365/safe-links-about)
 
-Auto functions to wrap links, commonly with Tenant ID, and Client fingerprint *and even email.* . 
+Auto functions to wrap links, commonly with Tenant ID and Client fingerprint *and even email.* . 
 
 Internally, it feeds:
 - the Unified Audit Log (`ThreatIntelligenceUrl`)
