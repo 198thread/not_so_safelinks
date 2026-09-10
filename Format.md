@@ -1,66 +1,66 @@
-### Schema 01 — 6 Fields
+### Schema Version 01 — 6 Fields
 
 | Pos | Values | Status |
 | - | - | - |
-| 0 | `01` | Fixed |
-| 1 | `01` | Fixed |
-| 2 | address / empty | Recipient. Locks field 4. Locks field 5 |
-| 3 | 32-hex | Message ID. Matches [Network Message ID](https://learn.microsoft.com/en-us/powershell/module/exchangepowershell/get-messagetracev2). Not RFC4122 — variant nibble random. No time order |
-| 4 | 32-hex | Tenant ID. RFC4122 confirmed. Recipient's tenant, not sender's |
-| 5 | `0` `1` | Unknown. Static per message. No flip observed on same message |
+| 0 | `01` | Schema Version |
+| 1 | `01` | ? - Fixed. |
+| 2 | `@ddress` / empty | Recipient. Locks fields 4 (Org Tenant ID) |
+| 3 | `<32-hex>` | Message ID |
+| 4 | `<32-hex>` | Org Tenant ID |
+| 5 | `0` / `1` | ? |
 
 ---
 
-### Schema 02 — 8 Fields
+### Schema Version 02 — 8 Fields
 
 | Pos | Values | Status |
 | - | - | - |
-| 0 | `02` | Fixed |
-| 1 | `01` | Fixed. `02` not observed here |
-| 2 | address / empty | Recipient. Locks field 4. Locks field 6 |
-| 3 | 32-hex | Message ID. Same as schema 01 |
-| 4 | 32-hex | Tenant ID. Same as schema 01 |
-| 5 | `0` `1` | Unknown. Static per message. Zero flips observed, any direction |
-| 6 | `0` `1` | Unknown. Dynamic per click. Flips both directions observed |
-| 7 | 18-digit | Ticks. [.NET DateTime.Ticks](https://learn.microsoft.com/en-us/dotnet/api/system.datetime.ticks). Converter: [epochconverter.com/dotnet](https://www.epochconverter.com/dotnet) |
+| 0 | `02` | Schema Version |
+| 1 | `01` | ? - Fixed. |
+| 2 | `@ddress` / empty | Recipient. Locks fields 4 (Org Tenant ID) |
+| 3 | `<32-hex>` | Message ID |
+| 4 | `<32-hex>` | Org Tenant ID |
+| 5 | `0` / `1` | ? |
+| 6 | `0` / `1` | ? |
+| 7 | `<18-digit timestamp>` | .Net Ticks. [.NET DateTime.Ticks](https://learn.microsoft.com/en-us/dotnet/api/system.datetime.ticks). Converter: [epochconverter.com/dotnet](https://www.epochconverter.com/dotnet) |
 
 ---
 
-### Schema 04 — 11 Fields
+### Schema Version 04 — 11 Fields
 
 | Pos | Values | Status |
 | - | - | - |
-| 0 | `04` | Fixed |
-| 1 | `01` | Fixed. `02` not observed here |
-| 2 | address / empty | Recipient. Locks fields 4, 8, 9 |
-| 3 | 32-hex | Message ID |
-| 4 | 32-hex | Tenant ID |
-| 5 | `0` `1` | Unknown |
-| 6 | `0` `1` | Unknown |
-| 7 | 18-digit | Ticks |
-| 8 | `Unknown` | Verdict. No `Good` here. Checked against [Defender threat classification](https://learn.microsoft.com/en-us/defender-office-365/mdo-threat-classification) — no match |
-| 9 | base64 | `Mailflow\|{V,P,AN,WT:2}`. No `EmptyMapi` here |
-| 10 | `0` `1000` `2000` `3000` `4000` `5000` `7000` | Unknown. Multiples of 1000 |
+| 0 | `04` | Schema Version |
+| 1 | `01` | ? - Fixed. |
+| 2 | `@ddress` / empty | Recipient. Locks fields 4 (Org Tenant ID), 8 & 9 |
+| 3 | `<32-hex>` | Message ID |
+| 4 | `<32-hex>` | Org Tenant ID |
+| 5 | `0` / `1` | ? |
+| 6 | `0` / `1` | ? |
+| 7 | `<18-digit timestamp>` | .Net Ticks. [.NET DateTime.Ticks](https://learn.microsoft.com/en-us/dotnet/api/system.datetime.ticks). Converter: [epochconverter.com/dotnet](https://www.epochconverter.com/dotnet) |
+| 8 | `Unknown` | Possibly Defender Threat Indicator?. No `Good` here. |
+| 9 | `<base64>` | `Mailflow\|{V,P,AN,WT:2}`. No `EmptyMapi` here |
+| 10 | `0` `1000` `2000` `3000` `4000` `5000` `7000` | ? - Multiples of 1000. No 6000. Possibly bit-mask |
 
 ---
 
-### Schema 05 — 11 Fields (14 raw, last 3 empty)
+### Schema Version 05 — 11 Fields (14 raw, last 3 empty)
 
 Not observed in every region checked.
 
 | Pos | Values | Status |
 | - | - | - |
-| 0 | `05` | Fixed |
-| 1 | `01` `02` | Matches [Entra B2B UserType](https://learn.microsoft.com/en-us/entra/external-id/user-properties): Member / Guest |
-| 2 | address / empty | Recipient. Locks field 4. Locks field 8 |
-| 3 | 32-hex | Message ID |
-| 4 | 32-hex | Tenant ID |
-| 5 | `0` `1` | Unknown. Static per message |
-| 6 | `0` `1` | Unknown. Dynamic per click |
-| 7 | 18-digit | Ticks. Confirmed |
-| 8 | `Unknown` `Good` | Verdict. `Good` pairs with `WAC`/WT:4 always. Rare |
-| 9 | base64 | `Mailflow\|{V,P,AN,WT:2}` or `WAC\|{V,P,AN,WT:4}`. `EmptyMapi` present implies field 1 = `02`. Reverse not true |
-| 10 | `0` `1` `1000`–`80000` | Unknown. `1` only on WT:4 rows |
+| 0 | `05` | Schema Version |
+| 1 | `01` / `02` | Possibly internal/external marker from [Entra B2B UserType](https://learn.microsoft.com/en-us/entra/external-id/user-properties): Member / Guest |
+| 2 | `@ddress` / empty | Recipient. Locks fields 4 (Org Tenant ID) & 8 |
+| 3 | `<32-hex>` | Message ID |
+| 4 | `<32-hex>` | Org Tenant ID |
+| 5 | `0` / `1` | ? |
+| 6 | `0` / `1` | ? |
+| 7 | `<18-digit timestamp>` | .Net Ticks. [.NET DateTime.Ticks](https://learn.microsoft.com/en-us/dotnet/api/system.datetime.ticks). Converter: [epochconverter.com/dotnet](https://www.epochconverter.com/dotnet) |
+| 8 | `Unknown` `Good` | ? - `Good` pairs with `WAC`/WT:4 always. Rare.  |
+| 9 | `<base64>` | `Mailflow\|{V,P,AN,WT:2}` or `WAC\|{V,P,AN,WT:4}`. `EmptyMapi` present implies field 1 = `02`. Reverse not true. |
+| 10 | `0` `1` `1000` `2000` `3000` `4000` `6000` `7000` `20000` `40000` `41000` `60000` `62000` `80000` | ? - `1` only on WT:4 rows. Possibly bit-mask. |
 
 ---
 
@@ -80,23 +80,14 @@ Not observed in every region checked.
 
 ---
 
-### Tenant ID Integrity
-
-| Check | Result |
-| - | - |
-| RFC4122 compliant, all schemas | Yes |
-| Stable per org | Yes |
-| Shared across clouds | No |
-| Shared across regions (same cloud) | Yes |
-| Encodes routing | No |
-
 ### Message ID Integrity
 
 | Check | Result |
 | - | - |
-| RFC4122 compliant | No |
-| Carries timestamp / order | No |
+| RFC4122/RFC9562 compliance | No |
 | Spans multiple ticks values per ID | Yes |
+
+Possibly using same generator as [GUID/UUID for Office](https://learn.microsoft.com/en-us/openspecs/office_file_formats/ms-onestore/ba2ccfe9-f8d9-4a32-ad9c-3b0b6e1037d6)
 
 ---
 
@@ -104,7 +95,5 @@ Not observed in every region checked.
 
 | | Field 5 | Field 6 |
 | - | - | - |
-| Flips across clicks of same message | No | Yes |
-| Looks per-message | Yes | No |
-| Looks per-click | No | Yes |
-| Meaning | Unknown | Unknown |
+| Dynamic despite same Message ID | No | Yes |
+| Meaning | ? | ? |
