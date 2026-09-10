@@ -64,9 +64,14 @@ a.href.toString()
 ```
 
 oneliner:
-```a.href.toString().replaceAll('%3A', ':').replaceAll('%2F','/').replaceAll('%3D','=').replaceAll('%40','@').replaceAll('%7C','|').replaceAll('&amp','&').replaceAll('&;','&').replace(/^.*&data=/,'').replace(/&(sdata|reserved).*/,'')```
+```
+a.href.toString().replaceAll('%3A', ':').replaceAll('%2F','/').replaceAll('%3D','=').replaceAll('%40','@').replaceAll('%7C','|').replaceAll('&amp','&').replaceAll('&;','&').replace(/^.*&data=/,'').replace(/&(sdata|reserved).*/,'')
+```
 
 The Client Fingerprint is not useful, but just in case..
 
 1. decode into a `const decodedUrl` from the above one-liner
-2. ```atob(decodedURL.split('|').find(element => element.slice(-1) == '=')))} catch {}```
+2. 
+```
+atob(decodedURL.split('|').find(element => element.slice(-1) == '=')))} catch {}
+```
