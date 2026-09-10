@@ -1,5 +1,5 @@
 # not_so_safelinks
-Informal learning notes on the [Azure Safelinks](https://learn.microsoft.com/en-us/defender-office-365/safe-links-about)
+Informal learning notes on the [MS Safelinks](https://learn.microsoft.com/en-us/defender-office-365/safe-links-about)
 
 Auto functions to wrap links, commonly with Tenant ID, Entra ID and Client fingerprint *and even email.* . 
 
@@ -63,9 +63,10 @@ a.href.toString()
   .replace(/&(sdata|reserved).*/,'')
 ```
 
-oneliner: `a.href.toString().replaceAll('%3A', ':').replaceAll('%2F','/').replaceAll('%3D','=').replaceAll('%40','@').replaceAll('%7C','|').replaceAll('&amp','&').replaceAll('&;','&').replace(/^.*&data=/,'').replace(/&(sdata|reserved).*/,'')`
+oneliner:
+`a.href.toString().replaceAll('%3A', ':').replaceAll('%2F','/').replaceAll('%3D','=').replaceAll('%40','@').replaceAll('%7C','|').replaceAll('&amp','&').replaceAll('&;','&').replace(/^.*&data=/,'').replace(/&(sdata|reserved).*/,'')`
 
 The Client Fingerprint is not useful, but just in case..
 
-1. decode into a `const decodedUrl` 
+1. decode into a `const decodedUrl` from the above one-liner
 2. `atob(decodedURL.split('|').find(element => element.slice(-1) == '=')))} catch {}`
